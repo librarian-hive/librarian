@@ -23,10 +23,9 @@ background: linear-gradient(346deg, rgba(227,237,247,1) 1%, rgba(154,152,152,1) 
 }
 .comment {
     text-align: left;
-    background-color: rgb(224,26,60);
-    clip-path: polygon(0 0, 75% 0, 63% 100%, 0 100%);
     padding: 10px;
     margin: -10px -10px 10px -10px;
+    background-color: gray;
     color: #fff;
 }
 
