@@ -173,15 +173,54 @@ def get_delegations_active(delegator):
         st.markdown('<p>@{} is currently not receiving any active delegations.</p>'.format(delegator), unsafe_allow_html=True)
 
 def get_dgp():
+    limit = 100
     SQLCommand = '''
-    SELECT hive_per_vest
+    SELECT COLUMN_NAME
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = 'DynamicGlobalProperties'
+    '''
+    result = hive_sql(SQLCommand, limit)
+    col_names = []
+    for col_name in result:
+        col_names.append(col_name[0])
+    SQLCommand = '''
+    SELECT *
     FROM DynamicGlobalProperties
     '''
-    result = hive_sql(SQLCommand, 10)
-    st.write(result[0][0])
+    result = hive_sql(SQLCommand, limit)
+    col_values = []
+    for col_value in result[0]:
+        col_values.append(col_value)
+    dgp = dict(zip(col_names, col_values))
+
+    header_row = ['Count','Dynamic Global Properties', 'Values']
+
+    def make_table(rows, header_row):
+        table = '<table>'
+        th = '<tr>'
+        for row in header_row:
+            r = '<th>{}</th>'.format(row)
+            th += r
+        th += '</tr>'
+        table += th
+        count = 1
+        data = ''
+        for name, value in rows.items():
+            td = '<tr><td>{}</td><td>{}</td><td>{}</td></tr>'.format(count, name, value)
+            count +=1
+            data += td
+        table += data
+        table += '</table>'
+        return table
+
+    table = make_table(dgp, header_row)
+    st.markdown('Hive Blockchain Dynamic Global Properties')
+    st.markdown(table, unsafe_allow_html=True)
+
 
 def get_posts():
     pass
+
 
 if __name__ == '__main__':
     #Initial page configuration
@@ -195,7 +234,7 @@ if __name__ == '__main__':
     logo = Image.open('lib_tr.png')
     st.sidebar.image(logo, width=300)
     #Sidebar Labels and Inputs
-    conversations = st.sidebar.checkbox('Conversations', value=True)
+    conversations = st.sidebar.checkbox('Conversations', value=False)
     if conversations:
         u2 = st.sidebar.empty()
         u1 = st.sidebar.empty()
@@ -211,7 +250,7 @@ if __name__ == '__main__':
         #When Get Conversations button is clicked
         if get_conversations_button:
             get_conversations(user1, user2)
-    rich_list = st.sidebar.checkbox('Hive Rich List', value=True)
+    rich_list = st.sidebar.checkbox('Hive Rich List', value=False)
     if rich_list:
         number_of_users = st.sidebar.radio('Choose number of users in the list',('Top 10', 'Top 50', 'Top 100', 'Top 500', 'Top 1000', 'Top 10000'),0)
         asset_type = st.sidebar.radio('Choose the asset type to sort by', ('Owned HP', 'Delegated HP', 'Received HP', 'Total HP', 'Hive', 'HBD', 'Hive-Savings', 'HBD-Savings'),3)
@@ -220,7 +259,7 @@ if __name__ == '__main__':
         #When Get Rich List button is clicked
         if get_rich_list_button:
             get_rich_list(number_of_users, asset_type)         
-    delegations = st.sidebar.checkbox('HP Delegations', value=True)
+    delegations = st.sidebar.checkbox('HP Delegations', value=False)
     if delegations:
         delegator = st.sidebar.text_input('Hive Username:', 'freedom')
         type_of_data = st.sidebar.radio('Choose between all or active delegations', ('All delegations', 'Active delegations'),1)
@@ -234,14 +273,14 @@ if __name__ == '__main__':
                 get_delegations_active(delegator)
 
 
-    dynamic_global_properties = st.sidebar.checkbox('Dynamic Global Properties', value=True)
+    dynamic_global_properties = st.sidebar.checkbox('Dynamic Global Properties', value=False)
     if dynamic_global_properties:
         dgp_button = st.sidebar.button('Get DGP')
         st.sidebar.markdown('<hr>', unsafe_allow_html=True)
         #When Get DGP button is clicked
         if dgp_button:
             get_dgp()        
-    search_posts = st.sidebar.checkbox('Hive Posts Search', value=True)
+    search_posts = st.sidebar.checkbox('Hive Posts Search', value=False)
     if search_posts:
         date_today = dt.datetime.today()
         date_before_today = date_today - dt.timedelta(days=10)
