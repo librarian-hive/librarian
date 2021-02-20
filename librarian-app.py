@@ -282,15 +282,17 @@ if __name__ == '__main__':
             get_dgp()        
     search_posts = st.sidebar.checkbox('Hive Posts Search', value=False)
     if search_posts:
-        date_today = dt.datetime.today()
-        date_before_today = date_today - dt.timedelta(days=10)
-        start_date = st.sidebar.date_input('Start Date:', date_before_today)
-        end_date = st.sidebar.date_input('End Date:', date_today)
-        get_posts_button = st.sidebar.button('Get Posts')
-        st.sidebar.markdown('<hr>', unsafe_allow_html=True)
-        #When Get Posts button is clicked
-        if get_posts_button:
-            get_posts()
+        st.markdown('<a href="https://librariansearch.herokuapp.com">Librarian Search App</a>', unsafe_allow_html=True)
+
+#         date_today = dt.datetime.today()
+#         date_before_today = date_today - dt.timedelta(days=10)
+#         start_date = st.sidebar.date_input('Start Date:', date_before_today)
+#         end_date = st.sidebar.date_input('End Date:', date_today)
+#         get_posts_button = st.sidebar.button('Get Posts')
+#         st.sidebar.markdown('<hr>', unsafe_allow_html=True)
+#         #When Get Posts button is clicked
+#         if get_posts_button:
+#             get_posts()
             
     #Styling the page. Style variable is imported from a separate styles.py file
     st.sidebar.markdown(style, unsafe_allow_html=True)
