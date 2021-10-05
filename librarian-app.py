@@ -282,7 +282,7 @@ if __name__ == '__main__':
             get_dgp()        
     search_posts = st.sidebar.checkbox('Hive Posts Search', value=False)
     if search_posts:
-        st.markdown('<a href="https://librariansearch.herokuapp.com">Librarian Search App</a>', unsafe_allow_html=True)
+        st.markdown('<a href="http://hive-search.herokuapp.com">Hive Search App</a>', unsafe_allow_html=True)
 
 #         date_today = dt.datetime.today()
 #         date_before_today = date_today - dt.timedelta(days=10)
