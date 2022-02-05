@@ -312,7 +312,7 @@ def get_curation_rewards(acct, start, end, order_by):
 
     result = hive_sql(SQLCommand, limit)
     df = pd.DataFrame(result)
-    df.rename(columns = {0: "HBD Interest Payments", 1: "Date"}, inplace=True)
+    df.rename(columns = {0: "Curation Rewards", 1: "Date"}, inplace=True)
     df.index = df.index + 1
     text = f'<h1>List of curation rewards by @{acct}</h1>'
     st.markdown(text, unsafe_allow_html=True)
