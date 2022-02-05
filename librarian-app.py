@@ -218,8 +218,105 @@ def get_dgp():
     st.markdown(table, unsafe_allow_html=True)
 
 
-def get_posts():
-    pass
+
+def get_hive_claimed(acct, start, end, order_by):
+    hive_per_vest = get_hive_per_vest()
+    limit = 1000000
+    SQLCommand = f'''
+    SELECT reward_hive, timestamp
+    FROM TxClaimRewardBalances
+    WHERE account = '{acct}'
+    AND reward_hive > 0
+    AND timestamp BETWEEN '{start}' AND '{end}'
+    ORDER BY timestamp {order_by}
+    '''
+    result = hive_sql(SQLCommand, limit)
+    df = pd.DataFrame(result)
+    df.rename(columns = {0: "Claimed Hive", 1: "Date"}, inplace=True)
+    df.index = df.index + 1
+    text = f'<h1>List of Hive claims by @{acct}</h1>'
+    st.markdown(text, unsafe_allow_html=True)
+    st.table(df)
+
+ 
+
+
+def get_hbd_claimed(acct, start, end, order_by):
+    hive_per_vest = get_hive_per_vest()
+    limit = 1000000
+    SQLCommand = f'''
+    SELECT reward_hbd, timestamp
+    FROM TxClaimRewardBalances
+    WHERE account = '{acct}'
+    AND reward_hbd > 0
+    AND timestamp BETWEEN '{start}' AND '{end}'
+    ORDER BY timestamp {order_by}
+    '''
+    result = hive_sql(SQLCommand, limit)
+    df = pd.DataFrame(result)
+    df.rename(columns = {0: "Claimed HBD", 1: "Date"}, inplace=True)
+    df.index = df.index + 1
+    text = f'<h1>List of HBD claims by @{acct}</h1>'
+    st.markdown(text, unsafe_allow_html=True)
+    st.table(df)
+
+
+def get_vests_claimed(acct, start, end, order_by):
+    hive_per_vest = get_hive_per_vest()
+    limit = 1000000
+    SQLCommand = f'''
+    SELECT CAST(ROUND(reward_vests * {hive_per_vest},2,0) AS NUMERIC(10,2)), timestamp
+    FROM TxClaimRewardBalances
+    WHERE account = '{acct}'
+    AND reward_vests > 0
+    AND timestamp BETWEEN '{start}' AND '{end}'
+    ORDER BY timestamp {order_by}
+    '''
+    result = hive_sql(SQLCommand, limit)
+    df = pd.DataFrame(result)
+    df.rename(columns = {0: "Claimed HP", 1: "Date"}, inplace=True)
+    df.index = df.index + 1
+    text = f'<h1>List of Hive Power claims by @{acct}</h1>'
+    st.markdown(text, unsafe_allow_html=True)
+    st.table(df)
+
+
+def get_hbd_interest(acct, start, end, order_by):
+    limit = 1000
+    SQLCommand = f'''
+    select interest, timestamp
+    from VOInterests
+    where owner = '{acct}'
+    and timestamp between '{start}' and '{end}'
+    order by timestamp {order_by}
+    '''
+    result = hive_sql(SQLCommand, limit)
+    df = pd.DataFrame(result)
+    df.rename(columns = {0: "HBD Interest Payments", 1: "Date"}, inplace=True)
+    df.index = df.index + 1
+    text = f'<h1>List of received HBD payments by @{acct}</h1>'
+    st.markdown(text, unsafe_allow_html=True)
+    st.table(df)
+
+def get_curation_rewards(acct, start, end, order_by):
+    hive_per_vest = get_hive_per_vest()
+    limit = 1000000
+
+    SQLCommand = f'''
+    select CAST(ROUND(reward * {hive_per_vest},2,0) AS NUMERIC(10,2)), timestamp
+    from VOCurationRewards 
+    where curator = '{acct}' 
+    and timestamp between '{start}' and '{end}'
+    order by timestamp {order_by}
+    '''
+
+    result = hive_sql(SQLCommand, limit)
+    df = pd.DataFrame(result)
+    df.rename(columns = {0: "HBD Interest Payments", 1: "Date"}, inplace=True)
+    df.index = df.index + 1
+    text = f'<h1>List of curation rewards by @{acct}</h1>'
+    st.markdown(text, unsafe_allow_html=True)
+    st.table(df)
 
 
 if __name__ == '__main__':
@@ -283,6 +380,32 @@ if __name__ == '__main__':
     search_posts = st.sidebar.checkbox('Hive Posts Search', value=False)
     if search_posts:
         st.markdown('<a href="https://hive-search.herokuapp.com">Hive Search App</a>', unsafe_allow_html=True)
+
+    hive_rewards = st.sidebar.checkbox('Hive Rewards', value=False)
+    if hive_rewards:
+        start_date = st.sidebar.empty()
+        end_date = st.sidebar.empty()
+        user_rewards = st.sidebar.empty()
+        start = start_date.date_input(label='Start Date:')
+        end = end_date.date_input(label='End Date:')
+        acct = user_rewards.text_input(label='Account Name:',value='')
+        order_by = st.sidebar.radio(label='Results Order:', options=["ASC", "DESC"], index=1)
+        get_hbd_claimed_button = st.sidebar.button('Get Claimed HBD')
+        get_hive_claimed_button = st.sidebar.button('Get Claimed Hive')
+        get_vests_button = st.sidebar.button('Get Claimed Hive Power')
+        get_hbd_interest_button = st.sidebar.button('Get HBD Interest')
+        get_curation_rewards_button = st.sidebar.button('Get Curation Rewards')
+    
+        if get_hbd_claimed_button:
+            get_hbd_claimed(acct, start, end, order_by)
+        if get_hive_claimed_button:
+            get_hive_claimed(acct, start, end, order_by)
+        if get_hbd_interest_button:
+            get_hbd_interest(acct, start, end, order_by)
+        if get_vests_button:
+            get_vests_claimed(acct, start, end, order_by)
+        if get_curation_rewards_button:
+            get_curation_rewards(acct, start, end, order_by)
 
 #         date_today = dt.datetime.today()
 #         date_before_today = date_today - dt.timedelta(days=10)
