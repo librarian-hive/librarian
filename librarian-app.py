@@ -379,7 +379,7 @@ if __name__ == '__main__':
             get_dgp()        
     search_posts = st.sidebar.checkbox('Hive Posts Search', value=False)
     if search_posts:
-        st.markdown('<a href="https://hive-search.herokuapp.com">Hive Search App</a>', unsafe_allow_html=True)
+        st.markdown('<a href="https://web-production-66a7.up.railway.app">Hive Search App</a>', unsafe_allow_html=True)
 
     hive_rewards = st.sidebar.checkbox('Hive Rewards', value=False)
     if hive_rewards:
